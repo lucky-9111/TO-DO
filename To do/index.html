@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e1e2f;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: #2b2b3d;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border-radius: 5px;
+      border: none;
+    }
+
+    input {
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: #00bcd4;
+      color: #111;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0097a7;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #3a3a4f;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+
+    .task-actions {
+      margin-top: 5px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .task-actions button {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .datetime {
+      font-size: 13px;
+      margin-top: 5px;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📝 To-Do List</h2>
+
+    <input type="text" id="taskInput" placeholder="Enter your task..." />
+    <input type="datetime-local" id="taskTime" />
+    <button onclick="addTask()">Add Task</button>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    let tasks = [];
+
+    function addTask() {
+      const taskText = document.getElementById('taskInput').value.trim();
+      const taskDateTime = document.getElementById('taskTime').value;
+
+      if (!taskText) return alert("Please enter a task");
+
+      const task = {
+        id: Date.now(),
+        text: taskText,
+        time: taskDateTime,
+        completed: false
+      };
+
+      tasks.push(task);
+      renderTasks();
+      document.getElementById('taskInput').value = '';
+      document.getElementById('taskTime').value = '';
+    }
+
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = task.completed ? 'completed' : '';
+        li.innerHTML = `
+          <strong>${task.text}</strong>
+          <div class="datetime">${task.time ? '📅 ' + task.time : ''}</div>
+          <div class="task-actions">
+            <button onclick="toggleComplete(${task.id})">${task.completed ? 'Undo' : 'Complete'}</button>
+            <button onclick="editTask(${task.id})">Edit</button>
+            <button onclick="deleteTask(${task.id})">Delete</button>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function toggleComplete(id) {
+      tasks = tasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      );
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+      renderTasks();
+    }
+
+    function editTask(id) {
+      const task = tasks.find(t => t.id === id);
+      const newText = prompt("Edit task:", task.text);
+      if (newText !== null && newText.trim() !== "") {
+        task.text = newText.trim();
+        renderTasks();
+      }
+    }
+  </script>
+</body>
+</html>
